@@ -18,7 +18,7 @@ nest_asyncio.apply()
 BASE_WAIT_TIME = 300
 MAX_WAIT_TIME = 10000
 
-class FastRequests:
+class FireRequests:
     def __init__(self):
         self.loop = asyncio.get_event_loop()
 
@@ -171,5 +171,5 @@ class FastRequests:
 if __name__ == "__main__":
     url = "https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso"
     filename = "Zorin-OS-17.2-Core-64-bit.iso"
-    fr = FastRequests()
+    fr = FireRequests()
     fr.compare_speed(url, filename)

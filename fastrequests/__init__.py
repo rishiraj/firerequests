@@ -1,1 +1,1 @@
-from .main import FastRequests
+from .main import FireRequests

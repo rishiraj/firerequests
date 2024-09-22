@@ -1,9 +1,9 @@
-# FastRequests: High-Performance Asynchronous HTTP Client
+# FireRequests 🔥
 
-[![PyPI version](https://badge.fury.io/py/fastrequests.svg)](https://badge.fury.io/py/fastrequests)
+[![PyPI version](https://badge.fury.io/py/firerequests.svg)](https://badge.fury.io/py/firerequests)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-FastRequests is a cutting-edge, high-performance asynchronous HTTP client library designed for blazing-fast file transfers. Leveraging advanced concurrency paradigms and innovative networking techniques, FastRequests achieves up to 5x real-world speed improvements over traditional synchronous methods.
+FireRequests is a cutting-edge, high-performance asynchronous HTTP client library designed for blazing-fast file transfers. Leveraging advanced concurrency paradigms and innovative networking techniques, FireRequests achieves up to 5x real-world speed improvements over traditional synchronous methods.
 
 ## Key Features
 
@@ -17,7 +17,7 @@ FastRequests is a cutting-edge, high-performance asynchronous HTTP client librar
 ## Installation
 
 ```bash
-pip install fastrequests
+pip install firerequests
 ```
 
 ## Usage Examples
@@ -25,9 +25,9 @@ pip install fastrequests
 ### High-Speed File Download
 
 ```python
-from fastrequests import FastRequests
+from firerequests import FireRequests
 
-fr = FastRequests()
+fr = FireRequests()
 url = "https://example.com/large-file.iso"
 filename = "large-file.iso"
 
@@ -38,9 +38,9 @@ fr.run_download(url, filename, max_files=10, chunk_size=2 * 1024 * 1024)
 ### Accelerated File Upload
 
 ```python
-from fastrequests import FastRequests
+from firerequests import FireRequests
 
-fr = FastRequests()
+fr = FireRequests()
 file_path = "large-file.iso"
 parts_urls = ["https://example.com/upload/part1", "https://example.com/upload/part2", ...]
 
@@ -51,11 +51,11 @@ fr.run_upload(file_path, parts_urls, chunk_size=5 * 1024 * 1024, max_files=8)
 ### Performance Comparison
 
 ```python
-fr = FastRequests()
+fr = FireRequests()
 url = "https://mirror.example.com/large-dataset.zip"
 filename = "large-dataset.zip"
 
-# Benchmark FastRequests against traditional methods
+# Benchmark FireRequests against traditional methods
 fr.compare_speed(url, filename)
 ```
 
@@ -65,12 +65,12 @@ fr.compare_speed(url, filename)
 
 ```python
 import asyncio
-from fastrequests import FastRequests
+from firerequests import FireRequests
 
 async def progress_callback(bytes_transferred):
     print(f"Transferred: {bytes_transferred / 1024 / 1024:.2f} MB")
 
-fr = FastRequests()
+fr = FireRequests()
 url = "https://example.com/massive-file.tar.gz"
 filename = "massive-file.tar.gz"
 
@@ -82,13 +82,13 @@ asyncio.run(fr.download_file(
 
 ## Performance Metrics
 
-In real-world tests, FastRequests demonstrated exceptional performance gains:
+In real-world tests, FireRequests demonstrated exceptional performance gains:
 
 - **Traditional Download**: 376.77 seconds
-- **FastRequests Download**: 75.75 seconds
+- **FireRequests Download**: 75.75 seconds
 - **Speed Improvement**: 4.98x faster
 
-These results showcase the significant efficiency enhancements achievable through FastRequests' advanced asynchronous architecture and optimized networking strategies.
+These results showcase the significant efficiency enhancements achievable through FireRequests' advanced asynchronous architecture and optimized networking strategies.
 
 ## Contributing
 
@@ -96,4 +96,4 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ## License
 
-FastRequests is released under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
+FireRequests is released under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
