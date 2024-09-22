@@ -148,10 +148,10 @@ class FireRequests:
         except Exception as e:
             print(f"Error in upload_chunk: {e}")
 
-    def download(self, url: str, filename: str, max_files: int, chunk_size: int):
+    def download(self, url: str, filename: str, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024):
         asyncio.run(self.download_file(url, filename, max_files, chunk_size))
 
-    def upload(self, file_path: str, parts_urls: List[str], chunk_size: int, max_files: int):
+    def upload(self, file_path: str, parts_urls: List[str], chunk_size: int = 2 * 1024 * 1024, max_files: int = 10):
         asyncio.run(self.upload_file(file_path, parts_urls, chunk_size, max_files))
 
     def normal_download(self, url: str, filename: str):
