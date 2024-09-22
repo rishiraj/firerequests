@@ -64,7 +64,7 @@ class FireRequests:
                     session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
                 ))
             
-            progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading")
+            progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
             for chunk_result in asyncio.as_completed(tasks):
                 downloaded = await chunk_result
                 progress_bar.update(downloaded)
@@ -103,7 +103,7 @@ class FireRequests:
                     session, part_url, file_path, start, chunk_size, semaphore, parallel_failures, max_retries
                 ))
 
-            progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Uploading")
+            progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Uploading on 🔥")
             for chunk_result in asyncio.as_completed(tasks):
                 uploaded = await chunk_result
                 progress_bar.update(uploaded)
@@ -146,7 +146,7 @@ class FireRequests:
     def normal_download(self, url: str, filename: str):
         response = requests.get(url, stream=True)
         total_size = int(response.headers.get('content-length', 0))
-        progress_bar = tqdm(total=total_size, unit="B", unit_scale=True, desc="Normal Download")
+        progress_bar = tqdm(total=total_size, unit="B", unit_scale=True, desc="Normal Download 🐌")
         with open(filename, 'wb') as f:
             for data in response.iter_content(1024):
                 progress_bar.update(len(data))
@@ -162,10 +162,10 @@ class FireRequests:
 
         start_time = time.time()
         asyncio.run(self.download_file(url, filename, max_files=10, chunk_size=2 * 1024 * 1024))
-        fast_time = time.time() - start_time
+        fire_time = time.time() - start_time
 
-        print(f"\nNormal Download Time: {normal_time:.2f} seconds")
-        print(f"Fast Download Time: {fast_time:.2f} seconds\n")
+        print(f"\n🐌 Download Time: {normal_time:.2f} seconds")
+        print(f"🔥 Download Time: {fire_time:.2f} seconds\n")
 
 
 if __name__ == "__main__":

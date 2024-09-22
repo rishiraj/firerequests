@@ -1,99 +1,96 @@
 # FireRequests 🔥
 
-[![PyPI version](https://badge.fury.io/py/firerequests.svg)](https://badge.fury.io/py/firerequests)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![PyPI version](https://img.shields.io/pypi/v/firerequests.svg)](https://pypi.org/project/firerequests/)  
+[![License](https://img.shields.io/pypi/l/firerequests.svg)](https://github.com/rishiraj/firerequests/blob/main/LICENSE)  
+[![Python version](https://img.shields.io/pypi/pyversions/firerequests.svg)](https://pypi.org/project/firerequests/)
 
-FireRequests is a cutting-edge, high-performance asynchronous HTTP client library designed for blazing-fast file transfers. Leveraging advanced concurrency paradigms and innovative networking techniques, FireRequests achieves up to 5x real-world speed improvements over traditional synchronous methods.
+**FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **5x real-world speedup** in file downloads and uploads compared to traditional synchronous methods.
 
-## Key Features
+## Features 🚀
 
-- **Asynchronous Architecture**: Utilizes `asyncio` for non-blocking I/O operations, maximizing throughput and minimizing latency.
-- **Concurrent Chunk Processing**: Implements parallel downloading and uploading of file chunks for optimal resource utilization.
-- **Adaptive Exponential Backoff**: Incorporates a sophisticated retry mechanism with jitter for robust error handling and network resilience.
-- **Semaphore-based Concurrency Control**: Employs fine-grained concurrency management to prevent resource exhaustion and ensure system stability.
-- **Progress Visualization**: Integrates `tqdm` for real-time progress tracking, enhancing user experience and operational visibility.
-- **Flexible API**: Supports both high-level convenience methods and low-level customization options for advanced use cases.
+- **Asynchronous I/O**: Non-blocking network and file operations using `asyncio`, `aiohttp`, and `aiofiles`, boosting throughput for I/O-bound tasks.
+- **Concurrent Transfers**: Uses `asyncio.Semaphore` to limit simultaneous tasks, optimizing performance by managing system resources effectively.
+- **Fault Tolerance**: Retries failed tasks with exponentially increasing wait times, adding random jitter to prevent network congestion.
+- **Chunked Processing**: Files are split into configurable chunks for parallel processing, significantly accelerating uploads/downloads.
+- **Compatibility**: Supports environments like Jupyter through `nest_asyncio`, enabling reusable `asyncio` loops for both batch and interactive Jupyter use.
 
-## Installation
+## Installation 📦
+
+Install FireRequests using pip:
 
 ```bash
 pip install firerequests
 ```
 
-## Usage Examples
+## Quick Start 🏁
 
-### High-Speed File Download
-
-```python
-from firerequests import FireRequests
-
-fr = FireRequests()
-url = "https://example.com/large-file.iso"
-filename = "large-file.iso"
-
-# Asynchronous download with optimized parameters
-fr.run_download(url, filename, max_files=10, chunk_size=2 * 1024 * 1024)
-```
-
-### Accelerated File Upload
+Accelerate your downloads with just a few lines of code:
 
 ```python
 from firerequests import FireRequests
 
-fr = FireRequests()
-file_path = "large-file.iso"
-parts_urls = ["https://example.com/upload/part1", "https://example.com/upload/part2", ...]
+url = "https://example.com/largefile.iso"
+filename = "largefile.iso"
 
-# Parallel multi-part upload
-fr.run_upload(file_path, parts_urls, chunk_size=5 * 1024 * 1024, max_files=8)
+fr = FireRequests()
+fr.download(url, filename)
 ```
 
-### Performance Comparison
+## Real-World Speed Test 🏎️
+
+FireRequests delivers significant performance improvements over traditional download methods. Below is the result of a real-world speed test:
+
+```plaintext
+Normal Download 🐌: 100%|██████████| 3.42G/3.42G [06:16<00:00, 9.08MB/s]
+Downloading on 🔥: 100%|██████████| 3.42G/3.42G [01:15<00:00, 45.2MB/s]
+
+🐌 Download Time: 376.77 seconds
+🔥 Download Time: 75.75 seconds
+```
+
+## Advanced Usage ⚙️
+
+### Downloading Files
 
 ```python
-fr = FireRequests()
-url = "https://mirror.example.com/large-dataset.zip"
-filename = "large-dataset.zip"
+from firerequests import FireRequests
 
-# Benchmark FireRequests against traditional methods
+url = "https://example.com/largefile.iso"
+filename = "largefile.iso"
+
+fr = FireRequests()
+fr.download(url, filename, max_files=10, chunk_size=2 * 1024 * 1024)
+```
+
+- **`url`**: The URL of the file to download.
+- **`filename`**: The local filename to save the downloaded file.
+- **`max_files`**: The maximum number of concurrent chunk downloads.
+- **`chunk_size`**: The size of each chunk in bytes.
+
+### Uploading Files
+
+```python
+from firerequests import FireRequests
+
+file_path = "largefile.iso"
+parts_urls = ["https://example.com/upload_part1", "https://example.com/upload_part2", ...]
+
+fr = FireRequests()
+fr.upload(file_path, parts_urls, chunk_size=2 * 1024 * 1024, max_files=10)
+```
+
+### Comparing Download Speed
+
+```python
+from firerequests import FireRequests
+
+url = "https://example.com/largefile.iso"
+filename = "largefile.iso"
+
+fr = FireRequests()
 fr.compare_speed(url, filename)
 ```
 
-## Advanced Usage
+## License 📄
 
-### Custom Callback Integration
-
-```python
-import asyncio
-from firerequests import FireRequests
-
-async def progress_callback(bytes_transferred):
-    print(f"Transferred: {bytes_transferred / 1024 / 1024:.2f} MB")
-
-fr = FireRequests()
-url = "https://example.com/massive-file.tar.gz"
-filename = "massive-file.tar.gz"
-
-asyncio.run(fr.download_file(
-    url, filename, max_files=12, chunk_size=4 * 1024 * 1024,
-    callback=progress_callback
-))
-```
-
-## Performance Metrics
-
-In real-world tests, FireRequests demonstrated exceptional performance gains:
-
-- **Traditional Download**: 376.77 seconds
-- **FireRequests Download**: 75.75 seconds
-- **Speed Improvement**: 4.98x faster
-
-These results showcase the significant efficiency enhancements achievable through FireRequests' advanced asynchronous architecture and optimized networking strategies.
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more details.
-
-## License
-
-FireRequests is released under the Apache License 2.0. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](https://github.com/rishiraj/firerequests/blob/main/LICENSE) file for details.
