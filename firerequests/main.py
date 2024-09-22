@@ -46,7 +46,7 @@ class FireRequests:
 
     async def download_file(
         self, url: str, filename: str, max_files: int, chunk_size: int, headers: Optional[Dict[str, str]] = None, 
-        parallel_failures: int = 0, max_retries: int = 0, callback: Optional[Any] = None
+        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None
     ):
         headers = headers or {}
         try:
@@ -96,7 +96,7 @@ class FireRequests:
 
     async def upload_file(
         self, file_path: str, parts_urls: List[str], chunk_size: int, max_files: int, 
-        parallel_failures: int = 0, max_retries: int = 0, callback: Optional[Any] = None
+        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None
     ):
         file_size = os.path.getsize(file_path)
         tasks = []

@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/firerequests.svg)](https://pypi.org/project/firerequests/)  [![License](https://img.shields.io/pypi/l/firerequests.svg)](https://github.com/rishiraj/firerequests/blob/main/LICENSE)  [![Python version](https://img.shields.io/pypi/pyversions/firerequests.svg)](https://pypi.org/project/firerequests/)
 
-**FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **5x real-world speedup** in file downloads and uploads compared to traditional synchronous methods.
+**FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **6x real-world speedup** in file downloads and uploads compared to traditional synchronous methods.
 
 ## Features 🚀
 
@@ -39,11 +39,11 @@ fr.download(url, filename)
 FireRequests delivers significant performance improvements over traditional download methods. Below is the result of a real-world speed test:
 
 ```plaintext
-Normal Download 🐌: 100%|██████████| 3.42G/3.42G [06:16<00:00, 9.08MB/s]
-Downloading on 🔥: 100%|██████████| 3.42G/3.42G [01:15<00:00, 45.2MB/s]
+Normal Download 🐌: 100%|██████████| 3.42G/3.42G [18:26<00:00, 3.09MB/s]
+Downloading on 🔥: 100%|██████████| 3.42G/3.42G [03:29<00:00, 16.4MB/s]
 
-🐌 Download Time: 376.77 seconds
-🔥 Download Time: 75.75 seconds
+🐌 Download Time: 1107.32 seconds
+🔥 Download Time: 209.41 seconds
 ```
 
 ## Advanced Usage ⚙️
