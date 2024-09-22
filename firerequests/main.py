@@ -5,6 +5,8 @@ import os
 import time
 import requests
 import nest_asyncio
+import argparse
+from urllib.parse import urlparse
 from aiohttp import ClientSession
 from aiofiles.os import remove
 from tqdm.asyncio import tqdm
@@ -181,9 +183,21 @@ class FireRequests:
         except Exception as e:
             print(f"Error in compare_speed: {e}")
 
+def main():
+    parser = argparse.ArgumentParser(description="FireRequests CLI")
+    parser.add_argument("url", type=str, help="The URL to download the file from")
+    parser.add_argument("--filename", type=str, help="The filename to save the download")
+    parser.add_argument("--max_files", type=int, default=10, help="The number of concurrent file chunks")
+    parser.add_argument("--chunk_size", type=int, default=2 * 1024 * 1024, help="The size of each chunk in bytes")
+    
+    args = parser.parse_args()
+    
+    # Extract filename from URL if not provided
+    if not args.filename:
+        args.filename = os.path.basename(urlparse(args.url).path)
+
+    fr = FireRequests()
+    fr.download(args.url, args.filename, args.max_files, args.chunk_size)
 
 if __name__ == "__main__":
-    url = "https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso"
-    filename = "Zorin-OS-17.2-Core-64-bit.iso"
-    fr = FireRequests()
-    fr.compare_speed(url, filename)
+    main()
