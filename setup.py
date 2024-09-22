@@ -47,6 +47,10 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.9",
-    # entry_points={"console_scripts": ["firerequests = firerequests.main:coming_soon"]},
+    entry_points={
+        "console_scripts": [
+            "firerequests=firerequests.main:main",
+        ],
+    },
     install_requires=requirements,
 )
