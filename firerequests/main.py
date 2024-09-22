@@ -137,10 +137,10 @@ class FireRequests:
                 response.raise_for_status()
         return len(chunk)
 
-    def run_download(self, url: str, filename: str, max_files: int, chunk_size: int):
+    def download(self, url: str, filename: str, max_files: int, chunk_size: int):
         asyncio.run(self.download_file(url, filename, max_files, chunk_size))
 
-    def run_upload(self, file_path: str, parts_urls: List[str], chunk_size: int, max_files: int):
+    def upload(self, file_path: str, parts_urls: List[str], chunk_size: int, max_files: int):
         asyncio.run(self.upload_file(file_path, parts_urls, chunk_size, max_files))
 
     def normal_download(self, url: str, filename: str):
