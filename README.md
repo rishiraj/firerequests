@@ -27,8 +27,8 @@ Accelerate your downloads with just a few lines of code:
 ```python
 from firerequests import FireRequests
 
-url = "https://example.com/largefile.iso"
-filename = "largefile.iso"
+url = "https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso"
+filename = "Zorin-OS-17.2-Core-64-bit.iso"
 
 fr = FireRequests()
 fr.download(url, filename)
