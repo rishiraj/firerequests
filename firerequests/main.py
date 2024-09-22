@@ -33,44 +33,50 @@ class FireRequests:
     ):
         range_header = {"Range": f"bytes={start}-{stop}"}
         headers.update(range_header)
-        async with session.get(url, headers=headers) as response:
-            response.raise_for_status()
-            content = await response.read()
-
-            async with aiofiles.open(filename, "r+b") as f:
-                await f.seek(start)
-                await f.write(content)
+        try:
+            async with session.get(url, headers=headers) as response:
+                response.raise_for_status()
+                content = await response.read()
+    
+                async with aiofiles.open(filename, "r+b") as f:
+                    await f.seek(start)
+                    await f.write(content)
+        except Exception as e:
+            print(f"Error in download_chunk: {e}")
 
     async def download_file(
         self, url: str, filename: str, max_files: int, chunk_size: int, headers: Optional[Dict[str, str]] = None, 
         parallel_failures: int = 0, max_retries: int = 0, callback: Optional[Any] = None
     ):
         headers = headers or {}
-        async with aiohttp.ClientSession() as session:
-            async with session.head(url) as resp:
-                file_size = int(resp.headers['Content-Length'])
-                chunks = range(0, file_size, chunk_size)
-            
-            # Create an empty file
-            async with aiofiles.open(filename, "wb") as f:
-                await f.seek(file_size - 1)
-                await f.write(b"\0")
-
-            semaphore = asyncio.Semaphore(max_files)
-            tasks = []
-            for start in chunks:
-                stop = min(start + chunk_size - 1, file_size - 1)
-                tasks.append(self.download_chunk_with_retries(
-                    session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
-                ))
-            
-            progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
-            for chunk_result in asyncio.as_completed(tasks):
-                downloaded = await chunk_result
-                progress_bar.update(downloaded)
-                if callback:
-                    await callback(downloaded)
-            progress_bar.close()
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.head(url) as resp:
+                    file_size = int(resp.headers['Content-Length'])
+                    chunks = range(0, file_size, chunk_size)
+                
+                # Create an empty file
+                async with aiofiles.open(filename, "wb") as f:
+                    await f.seek(file_size - 1)
+                    await f.write(b"\0")
+    
+                semaphore = asyncio.Semaphore(max_files)
+                tasks = []
+                for start in chunks:
+                    stop = min(start + chunk_size - 1, file_size - 1)
+                    tasks.append(self.download_chunk_with_retries(
+                        session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
+                    ))
+                
+                progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
+                for chunk_result in asyncio.as_completed(tasks):
+                    downloaded = await chunk_result
+                    progress_bar.update(downloaded)
+                    if callback:
+                        await callback(downloaded)
+                progress_bar.close()
+        except Exception as e:
+            print(f"Error in download_file: {e}")
 
     async def download_chunk_with_retries(
         self, session: ClientSession, url: str, filename: str, start: int, stop: int, headers: Dict[str, str], 
@@ -95,21 +101,23 @@ class FireRequests:
         file_size = os.path.getsize(file_path)
         tasks = []
         semaphore = asyncio.Semaphore(max_files)
-
-        async with aiohttp.ClientSession() as session:
-            for part_number, part_url in enumerate(parts_urls):
-                start = part_number * chunk_size
-                tasks.append(self.upload_chunk_with_retries(
-                    session, part_url, file_path, start, chunk_size, semaphore, parallel_failures, max_retries
-                ))
-
-            progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Uploading on 🔥")
-            for chunk_result in asyncio.as_completed(tasks):
-                uploaded = await chunk_result
-                progress_bar.update(uploaded)
-                if callback:
-                    await callback(uploaded)
-            progress_bar.close()
+        try:
+            async with aiohttp.ClientSession() as session:
+                for part_number, part_url in enumerate(parts_urls):
+                    start = part_number * chunk_size
+                    tasks.append(self.upload_chunk_with_retries(
+                        session, part_url, file_path, start, chunk_size, semaphore, parallel_failures, max_retries
+                    ))
+    
+                progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Uploading on 🔥")
+                for chunk_result in asyncio.as_completed(tasks):
+                    uploaded = await chunk_result
+                    progress_bar.update(uploaded)
+                    if callback:
+                        await callback(uploaded)
+                progress_bar.close()
+        except Exception as e:
+            print(f"Error in upload_file: {e}")
 
     async def upload_chunk_with_retries(
         self, session: ClientSession, url: str, file_path: str, start: int, chunk_size: int, 
@@ -129,13 +137,16 @@ class FireRequests:
     async def upload_chunk(
         self, session: ClientSession, url: str, file_path: str, start: int, chunk_size: int
     ):
-        async with aiofiles.open(file_path, 'rb') as f:
-            await f.seek(start)
-            chunk = await f.read(chunk_size)
-            headers = {'Content-Length': str(len(chunk))}
-            async with session.put(url, data=chunk, headers=headers) as response:
-                response.raise_for_status()
-        return len(chunk)
+        try:
+            async with aiofiles.open(file_path, 'rb') as f:
+                await f.seek(start)
+                chunk = await f.read(chunk_size)
+                headers = {'Content-Length': str(len(chunk))}
+                async with session.put(url, data=chunk, headers=headers) as response:
+                    response.raise_for_status()
+            return len(chunk)
+        except Exception as e:
+            print(f"Error in upload_chunk: {e}")
 
     def download(self, url: str, filename: str, max_files: int, chunk_size: int):
         asyncio.run(self.download_file(url, filename, max_files, chunk_size))
@@ -154,18 +165,21 @@ class FireRequests:
         progress_bar.close()
 
     def compare_speed(self, url: str, filename: str):
-        start_time = time.time()
-        self.normal_download(url, filename)
-        normal_time = time.time() - start_time
-
-        os.remove(filename)
-
-        start_time = time.time()
-        asyncio.run(self.download_file(url, filename, max_files=10, chunk_size=2 * 1024 * 1024))
-        fire_time = time.time() - start_time
-
-        print(f"\n🐌 Download Time: {normal_time:.2f} seconds")
-        print(f"🔥 Download Time: {fire_time:.2f} seconds\n")
+        try:
+            start_time = time.time()
+            self.normal_download(url, filename)
+            normal_time = time.time() - start_time
+    
+            os.remove(filename)
+    
+            start_time = time.time()
+            asyncio.run(self.download_file(url, filename, max_files=10, chunk_size=2 * 1024 * 1024))
+            fire_time = time.time() - start_time
+    
+            print(f"\n🐌 Download Time: {normal_time:.2f} seconds")
+            print(f"🔥 Download Time: {fire_time:.2f} seconds\n")
+        except Exception as e:
+            print(f"Error in compare_speed: {e}")
 
 
 if __name__ == "__main__":
