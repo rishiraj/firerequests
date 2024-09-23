@@ -66,8 +66,8 @@ class FireRequests:
                     print(f"HTTP request sent, awaiting response... {resp.status} {resp.reason}")
                     file_size = int(resp.headers['Content-Length'])
                     content_type = resp.headers.get('Content-Type', 'application/octet-stream')
-                    print(f"Length: {file_size} ({file_size // (1024 * 1024):.1f}M) [{content_type}]")
-                    print(f"Saving to: '{filename}'\n")
+                    print(f"Length: {file_size} ({file_size / (1024 * 1024 * 1024):.1f}G) [{content_type}]")
+                    print(f"Saving to: ‘{filename}’\n")
                     chunks = range(0, file_size, chunk_size)
     
                 # Create an empty file
