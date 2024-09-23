@@ -39,7 +39,7 @@ fr.download(url, filename)
 ### Command Line Interface
 
 ```bash
-!fr download https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso
+fr download https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso
 ```
 
 #### Parameters:
@@ -53,19 +53,16 @@ fr.download(url, filename)
 FireRequests delivers significant performance improvements over traditional download methods. Below is the result of a real-world speed test:
 
 ```plaintext
-Normal Download 🐌: 100%|██████████| 3.42G/3.42G [18:26<00:00, 3.09MB/s]
-Downloading on 🔥: 100%|██████████| 3.42G/3.42G [03:29<00:00, 16.4MB/s]
+Normal Download 🐌: 100%|██████████| 3.42G/3.42G [18:24<00:00, 3.10MB/s]
+Downloading on 🔥: 100%|██████████| 3.42G/3.42G [02:38<00:00, 21.6MB/s]
 
-🐌 Download Time: 1107.32 seconds
-🔥 Download Time: 209.41 seconds
+🐌 Download Time: 1104.84 seconds
+🔥 Download Time: 158.22 seconds
 ```
 
-<Tip warning={true}>
-
-For Hugging Face Hub downloads it is recommended to use `hf_transfer` for maximum speed gains!
-For more details, please take a look at this [section](https://huggingface.co/docs/huggingface_hub/hf_transfer).
-
-</Tip>
+> [!TIP]
+> For Hugging Face Hub downloads it is recommended to use `hf_transfer` for maximum speed gains!
+> For more details, please take a look at this [section](https://huggingface.co/docs/huggingface_hub/hf_transfer).
 
 ## Advanced Usage ⚙️
 
@@ -107,7 +104,7 @@ url = "https://example.com/largefile.iso"
 filename = "largefile.iso"
 
 fr = FireRequests()
-fr.compare_speed(url, filename)
+fr.compare(url, filename)
 ```
 
 ## License 📄
