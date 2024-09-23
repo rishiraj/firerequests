@@ -5,7 +5,8 @@ import os
 import time
 import requests
 import nest_asyncio
-import argparse
+# import argparse
+import fire
 from urllib.parse import urlparse
 from aiohttp import ClientSession
 from aiofiles.os import remove
@@ -153,7 +154,10 @@ class FireRequests:
         except Exception as e:
             print(f"Error in upload_chunk: {e}")
 
-    def download(self, url: str, filename: str, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024):
+    def download(self, url: str, filename: Optional[str] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024):
+        # Extract filename from URL if not provided
+        if filename is None:
+            filename = os.path.basename(urlparse(url).path)
         asyncio.run(self.download_file(url, filename, max_files, chunk_size))
 
     def upload(self, file_path: str, parts_urls: List[str], chunk_size: int = 2 * 1024 * 1024, max_files: int = 10):
@@ -169,7 +173,9 @@ class FireRequests:
                 f.write(data)
         progress_bar.close()
 
-    def compare_speed(self, url: str, filename: str):
+    def compare_speed(self, url: str, filename: Optional[str] = None):
+        if filename is None:
+            filename = os.path.basename(urlparse(url).path)
         try:
             start_time = time.time()
             self.normal_download(url, filename)
@@ -186,21 +192,5 @@ class FireRequests:
         except Exception as e:
             print(f"Error in compare_speed: {e}")
 
-def main():
-    parser = argparse.ArgumentParser(description="FireRequests CLI")
-    parser.add_argument("url", type=str, help="The URL to download the file from")
-    parser.add_argument("--filename", type=str, help="The filename to save the download")
-    parser.add_argument("--max_files", type=int, default=10, help="The number of concurrent file chunks")
-    parser.add_argument("--chunk_size", type=int, default=2 * 1024 * 1024, help="The size of each chunk in bytes")
-    
-    args = parser.parse_args()
-    
-    # Extract filename from URL if not provided
-    if not args.filename:
-        args.filename = os.path.basename(urlparse(args.url).path)
-
-    fr = FireRequests()
-    fr.download(args.url, args.filename, args.max_files, args.chunk_size)
-
 if __name__ == "__main__":
-    main()
+    fire.Fire(FireRequests)
