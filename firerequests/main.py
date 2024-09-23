@@ -5,7 +5,7 @@ import os
 import time
 import requests
 import nest_asyncio
-# import argparse
+import socket
 import fire
 from urllib.parse import urlparse
 from aiohttp import ClientSession
@@ -53,12 +53,27 @@ class FireRequests:
     ):
         headers = headers or {}
         try:
+            # Resolve the domain name and get IP address
+            parsed_url = urlparse(url)
+            ip_address = socket.gethostbyname(parsed_url.hostname)
+    
             async with aiohttp.ClientSession() as session:
-                # First, follow any redirects and get the final download URL
+                # Follow redirects and get the final download URL
                 async with session.head(url, allow_redirects=True) as resp:
                     if resp.status in [301, 302]:
-                        url = str(resp.url)  # The final resolved URL after redirection
+                        url = str(resp.url)  # Final URL after redirection
+                    
+                    # Print wget-like headers
+                    print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
+                    print(f"Resolving {parsed_url.hostname} ({parsed_url.hostname})... {ip_address}")
+                    print(f"Connecting to {parsed_url.hostname} ({ip_address})... connected.")
+                    print(f"HTTP request sent, awaiting response... {resp.status} {resp.reason}")
+                    
                     file_size = int(resp.headers['Content-Length'])
+                    content_type = resp.headers.get('Content-Type', 'application/octet-stream')
+                    print(f"Length: {file_size} ({file_size // (1024 * 1024):.1f}M) [{content_type}]")
+                    print(f"Saving to: '{filename}'\n")
+    
                     chunks = range(0, file_size, chunk_size)
     
                 # Create an empty file
