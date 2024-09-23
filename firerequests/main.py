@@ -53,10 +53,13 @@ class FireRequests:
         headers = headers or {}
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.head(url) as resp:
+                # First, follow any redirects and get the final download URL
+                async with session.head(url, allow_redirects=True) as resp:
+                    if resp.status in [301, 302]:
+                        url = str(resp.url)  # The final resolved URL after redirection
                     file_size = int(resp.headers['Content-Length'])
                     chunks = range(0, file_size, chunk_size)
-                
+    
                 # Create an empty file
                 async with aiofiles.open(filename, "wb") as f:
                     await f.seek(file_size - 1)
@@ -69,7 +72,7 @@ class FireRequests:
                     tasks.append(self.download_chunk_with_retries(
                         session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
                     ))
-                
+    
                 progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
                 for chunk_result in asyncio.as_completed(tasks):
                     downloaded = await chunk_result
