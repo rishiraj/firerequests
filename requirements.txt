@@ -4,3 +4,4 @@ requests
 nest_asyncio
 tqdm
 httpx
+fire
