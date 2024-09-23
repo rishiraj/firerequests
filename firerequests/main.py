@@ -60,14 +60,21 @@ class FireRequests:
             async with aiohttp.ClientSession() as session:
                 # Follow redirects and get the final download URL
                 async with session.head(url, allow_redirects=True) as resp:
-                    if resp.status in [301, 302]:
-                        url = str(resp.url)  # Final URL after redirection
-                    
                     # Print wget-like headers
                     print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
                     print(f"Resolving {parsed_url.hostname} ({parsed_url.hostname})... {ip_address}")
                     print(f"Connecting to {parsed_url.hostname} ({ip_address})... connected.")
                     print(f"HTTP request sent, awaiting response... {resp.status} {resp.reason}")
+
+                    if resp.status in [301, 302]:
+                        url = str(resp.url)  # Final URL after redirection
+                        print(f"Location: {url}")
+                        parsed_url = urlparse(url)
+                        ip_address = socket.gethostbyname(parsed_url.hostname)
+                        print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
+                        print(f"Resolving {parsed_url.hostname} ({parsed_url.hostname})... {ip_address}")
+                        print(f"Connecting to {parsed_url.hostname} ({ip_address})... connected.")
+                        print(f"HTTP request sent, awaiting response... {resp.status} {resp.reason}")
                     
                     file_size = int(resp.headers['Content-Length'])
                     content_type = resp.headers.get('Content-Type', 'application/octet-stream')
