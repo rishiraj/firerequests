@@ -58,12 +58,11 @@ class FireRequests:
                 async with session.head(url, allow_redirects=True) as resp:
                     # Resolve the domain name and get IP address
                     url = str(resp.url)
+                    print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
                     parsed_url = urlparse(url)
                     ip_address = socket.gethostbyname(parsed_url.hostname)
-                    # Print wget-like headers
-                    print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
                     print(f"Resolving {parsed_url.hostname} ({parsed_url.hostname})... {ip_address}")
-                    print(f"Connecting to {parsed_url.hostname} ({ip_address})... connected.")
+                    print(f"Connecting to {parsed_url.hostname} ({parsed_url.hostname})|{ip_address}|:443... connected.")
                     print(f"HTTP request sent, awaiting response... {resp.status} {resp.reason}")
                     file_size = int(resp.headers['Content-Length'])
                     content_type = resp.headers.get('Content-Type', 'application/octet-stream')
