@@ -164,7 +164,7 @@ class FireRequests:
         total_size = int(response.headers.get('content-length', 0))
         progress_bar = tqdm(total=total_size, unit="B", unit_scale=True, desc="Normal Download 🐌")
         with open(filename, 'wb') as f:
-            for data in response.iter_content(1024):
+            for data in response.iter_content(2 * 1024 * 1024):
                 progress_bar.update(len(data))
                 f.write(data)
         progress_bar.close()
