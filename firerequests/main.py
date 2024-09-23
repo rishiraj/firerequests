@@ -173,7 +173,7 @@ class FireRequests:
                 f.write(data)
         progress_bar.close()
 
-    def compare_speed(self, url: str, filename: Optional[str] = None):
+    def compare(self, url: str, filename: Optional[str] = None):
         if filename is None:
             filename = os.path.basename(urlparse(url).path)
         try:
@@ -190,7 +190,7 @@ class FireRequests:
             print(f"\n🐌 Download Time: {normal_time:.2f} seconds")
             print(f"🔥 Download Time: {fire_time:.2f} seconds\n")
         except Exception as e:
-            print(f"Error in compare_speed: {e}")
+            print(f"Error in compare: {e}")
 
 def main():
     fire.Fire(FireRequests)
