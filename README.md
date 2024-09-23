@@ -17,7 +17,7 @@
 Install FireRequests using pip:
 
 ```bash
-pip install firerequests
+!pip install firerequests
 ```
 
 ## Quick Start 🏁
@@ -30,16 +30,15 @@ Accelerate your downloads with just a few lines of code:
 from firerequests import FireRequests
 
 url = "https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso"
-filename = "Zorin-OS-17.2-Core-64-bit.iso"
 
 fr = FireRequests()
-fr.download(url, filename)
+fr.download(url)
 ```
 
 ### Command Line Interface
 
 ```bash
-fr download https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso
+!fr download https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso
 ```
 
 #### Parameters:
@@ -101,10 +100,9 @@ fr.upload(file_path, parts_urls, chunk_size=2 * 1024 * 1024, max_files=10)
 from firerequests import FireRequests
 
 url = "https://example.com/largefile.iso"
-filename = "largefile.iso"
 
 fr = FireRequests()
-fr.compare(url, filename)
+fr.compare(url)
 ```
 
 ## License 📄
