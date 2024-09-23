@@ -39,7 +39,7 @@ fr.download(url, filename)
 ### Command Line Interface
 
 ```bash
-!firerequests https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso --filename Zorin-OS-17.2-Core-64-bit.iso
+!fr download https://mirror.clarkson.edu/zorinos/isos/17/Zorin-OS-17.2-Core-64-bit.iso
 ```
 
 #### Parameters:
@@ -59,6 +59,13 @@ Downloading on 🔥: 100%|██████████| 3.42G/3.42G [03:29<00:
 🐌 Download Time: 1107.32 seconds
 🔥 Download Time: 209.41 seconds
 ```
+
+<Tip warning={true}>
+
+For Hugging Face Hub downloads it is recommended to use `hf_transfer` for maximum speed gains!
+For more details, please take a look at this [section](https://huggingface.co/docs/huggingface_hub/hf_transfer).
+
+</Tip>
 
 ## Advanced Usage ⚙️
 
