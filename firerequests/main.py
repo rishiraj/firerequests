@@ -192,5 +192,5 @@ class FireRequests:
         except Exception as e:
             print(f"Error in compare_speed: {e}")
 
-if __name__ == "__main__":
+def main():
     fire.Fire(FireRequests)
