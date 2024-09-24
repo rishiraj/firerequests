@@ -1,6 +1,10 @@
 # FireRequests 🔥
 
-[![PyPI version](https://img.shields.io/pypi/v/firerequests.svg)](https://pypi.org/project/firerequests/)  [![License](https://img.shields.io/pypi/l/firerequests.svg)](https://github.com/rishiraj/firerequests/blob/main/LICENSE)  [![Python version](https://img.shields.io/pypi/pyversions/firerequests.svg)](https://pypi.org/project/firerequests/)
+<p align="center">
+    <a href="https://github.com/rishiraj/firerequests/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/rishiraj/firerequests.svg"></a>
+    <a href="https://github.com/rishiraj/firerequests"><img alt="PyPi version" src="https://img.shields.io/pypi/pyversions/firerequests.svg"></a>
+    <a href="https://pypi.org/project/firerequests"><img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/firerequests"></a>
+</p>
 
 **FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **6x real-world speedup** in file downloads and uploads compared to traditional synchronous methods.
 
