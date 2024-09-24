@@ -35,7 +35,7 @@ class FireRequests:
     def check_http_version(self, url: str) -> str:
         # Check HTTP version using httpx
         with httpx.Client(http2=True) as client:
-            response = client.get(url)
+            response = client.head(url)
             return response.http_version
 
     async def download_chunk(
