@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import aiofiles
+import httpx
 import os
 import time
 import requests
@@ -30,6 +31,12 @@ class FireRequests:
 
     def _jitter(self) -> int:
         return os.urandom(2)[0] % 500
+    
+    def check_http_version(self, url: str) -> str:
+        # Check HTTP version using httpx
+        with httpx.Client(http2=True) as client:
+            response = client.get(url)
+            return response.http_version
 
     async def download_chunk(
         self, session: ClientSession, url: str, start: int, stop: int, headers: Dict[str, str], filename: str
@@ -46,6 +53,22 @@ class FireRequests:
                     await f.write(content)
         except Exception as e:
             print(f"Error in download_chunk: {e}")
+
+    async def download_chunk_httpx(
+        self, client: httpx.AsyncClient, url: str, start: int, stop: int, headers: Dict[str, str], filename: str
+    ):
+        range_header = {"Range": f"bytes={start}-{stop}"}
+        headers.update(range_header)
+        try:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            content = response.content
+
+            async with aiofiles.open(filename, "r+b") as f:
+                await f.seek(start)
+                await f.write(content)
+        except Exception as e:
+            print(f"Error in download_chunk_httpx: {e}")
 
     async def download_file(
         self, url: str, filename: str, max_files: int, chunk_size: int, headers: Optional[Dict[str, str]] = None, 
@@ -76,12 +99,21 @@ class FireRequests:
                     await f.write(b"\0")
     
                 semaphore = asyncio.Semaphore(max_files)
+                http_version = self.check_http_version(url)
                 tasks = []
-                for start in chunks:
-                    stop = min(start + chunk_size - 1, file_size - 1)
-                    tasks.append(self.download_chunk_with_retries(
-                        session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
-                    ))
+                if http_version == 'HTTP/2':
+                    async with httpx.AsyncClient(http2=True) as client:
+                        for start in chunks:
+                            stop = min(start + chunk_size - 1, file_size - 1)
+                            tasks.append(self.download_chunk_with_retries_httpx(
+                                client, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
+                            ))
+                else:
+                    for start in chunks:
+                        stop = min(start + chunk_size - 1, file_size - 1)
+                        tasks.append(self.download_chunk_with_retries(
+                            session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
+                        ))
     
                 progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
                 for chunk_result in asyncio.as_completed(tasks):
@@ -102,6 +134,22 @@ class FireRequests:
             while attempt <= max_retries:
                 try:
                     await self.download_chunk(session, url, start, stop, headers, filename)
+                    return stop - start + 1
+                except Exception as e:
+                    if attempt == max_retries:
+                        raise e
+                    await asyncio.sleep(self.exponential_backoff(BASE_WAIT_TIME, attempt, MAX_WAIT_TIME))
+                    attempt += 1
+
+    async def download_chunk_with_retries_httpx(
+        self, client: httpx.AsyncClient, url: str, filename: str, start: int, stop: int, headers: Dict[str, str], 
+        semaphore: asyncio.Semaphore, parallel_failures: int, max_retries: int
+    ):
+        async with semaphore:
+            attempt = 0
+            while attempt <= max_retries:
+                try:
+                    await self.download_chunk_httpx(client, url, start, stop, headers, filename)
                     return stop - start + 1
                 except Exception as e:
                     if attempt == max_retries:
