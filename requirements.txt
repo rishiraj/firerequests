@@ -3,5 +3,5 @@ aiofiles
 requests
 nest_asyncio
 tqdm
-httpx
+httpx[http2]
 fire
