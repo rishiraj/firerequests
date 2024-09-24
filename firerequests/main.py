@@ -75,55 +75,87 @@ class FireRequests:
         parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None
     ):
         headers = headers or {}
-        try:
-            async with aiohttp.ClientSession() as session:
-                # Follow redirects and get the final download URL
-                async with session.head(url, allow_redirects=True) as resp:
-                    # Resolve the domain name and get IP address
-                    url = str(resp.url)
+        # Resolve the domain name and get IP address
+        url = (requests.head(url, allow_redirects=True)).url
+        http_version = self.check_http_version(url)
+        if http_version == 'HTTP/2':
+            try:
+                async with httpx.AsyncClient(http2=True) as client:
+                    # Get the file information with a HEAD request
+                    response = await client.head(url)
                     print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
                     parsed_url = urlparse(url)
                     ip_address = socket.gethostbyname(parsed_url.hostname)
                     print(f"Resolving {parsed_url.hostname} ({parsed_url.hostname})... {ip_address}")
                     print(f"Connecting to {parsed_url.hostname} ({parsed_url.hostname})|{ip_address}|:443... connected.")
-                    print(f"HTTP request sent, awaiting response... {resp.status} {resp.reason}")
-                    file_size = int(resp.headers['Content-Length'])
-                    content_type = resp.headers.get('Content-Type', 'application/octet-stream')
+                    print(f"HTTP request sent, awaiting response... {response.status_code} {response.reason_phrase}")
+                    file_size = int(response.headers['Content-Length'])
+                    content_type = response.headers.get('Content-Type', 'application/octet-stream')
                     print(f"Length: {file_size} ({file_size / (1024 * 1024 * 1024):.1f}G) [{content_type}]")
                     print(f"Saving to: ‘{filename}’\n")
                     chunks = range(0, file_size, chunk_size)
-    
-                # Create an empty file
-                async with aiofiles.open(filename, "wb") as f:
-                    await f.seek(file_size - 1)
-                    await f.write(b"\0")
-    
-                semaphore = asyncio.Semaphore(max_files)
-                http_version = self.check_http_version(url)
-                tasks = []
-                if http_version == 'HTTP/2':
-                    async with httpx.AsyncClient(http2=True) as client:
-                        for start in chunks:
-                            stop = min(start + chunk_size - 1, file_size - 1)
-                            tasks.append(self.download_chunk_with_retries_httpx(
-                                client, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
-                            ))
-                else:
+
+                    # Create an empty file
+                    async with aiofiles.open(filename, "wb") as f:
+                        await f.seek(file_size - 1)
+                        await f.write(b"\0")
+
+                    semaphore = asyncio.Semaphore(max_files)
+                    tasks = []
+                    for start in chunks:
+                        stop = min(start + chunk_size - 1, file_size - 1)
+                        tasks.append(self.download_chunk_with_retries_httpx(
+                            client, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
+                        ))
+
+                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
+                    for chunk_result in asyncio.as_completed(tasks):
+                        downloaded = await chunk_result
+                        progress_bar.update(downloaded)
+                        if callback:
+                            await callback(downloaded)
+                    progress_bar.close()
+            except Exception as e:
+                print(f"Error in download_file httpx: {e}")
+        else:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    # Follow redirects and get the final download URL
+                    async with session.head(url, allow_redirects=True) as resp:
+                        print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
+                        parsed_url = urlparse(url)
+                        ip_address = socket.gethostbyname(parsed_url.hostname)
+                        print(f"Resolving {parsed_url.hostname} ({parsed_url.hostname})... {ip_address}")
+                        print(f"Connecting to {parsed_url.hostname} ({parsed_url.hostname})|{ip_address}|:443... connected.")
+                        print(f"HTTP request sent, awaiting response... {resp.status} {resp.reason}")
+                        file_size = int(resp.headers['Content-Length'])
+                        content_type = resp.headers.get('Content-Type', 'application/octet-stream')
+                        print(f"Length: {file_size} ({file_size / (1024 * 1024 * 1024):.1f}G) [{content_type}]")
+                        print(f"Saving to: ‘{filename}’\n")
+                        chunks = range(0, file_size, chunk_size)
+        
+                    # Create an empty file
+                    async with aiofiles.open(filename, "wb") as f:
+                        await f.seek(file_size - 1)
+                        await f.write(b"\0")
+        
+                    semaphore = asyncio.Semaphore(max_files)
+                    tasks = []
                     for start in chunks:
                         stop = min(start + chunk_size - 1, file_size - 1)
                         tasks.append(self.download_chunk_with_retries(
                             session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
                         ))
-    
-                progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
-                for chunk_result in asyncio.as_completed(tasks):
-                    downloaded = await chunk_result
-                    progress_bar.update(downloaded)
-                    if callback:
-                        await callback(downloaded)
-                progress_bar.close()
-        except Exception as e:
-            print(f"Error in download_file: {e}")
+        
+                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
+                    for chunk_result in asyncio.as_completed(tasks):
+                        downloaded = await chunk_result
+                        progress_bar.update(downloaded)
+                        if callback:
+                            await callback(downloaded)
+                    progress_bar.close()
+            except Exception as e:
+                print(f"Error in download_file aiohttp: {e}")
 
     async def download_chunk_with_retries(
         self, session: ClientSession, url: str, filename: str, start: int, stop: int, headers: Dict[str, str], 
