@@ -113,7 +113,7 @@ fr.compare(url)
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](https://github.com/rishiraj/firerequests/blob/main/LICENSE) file for details.
 
-Sponsors
+Sponsors ❤️
 --------
 Become a sponsor and get a logo here. The funds are used to defray the cost of development.
 
