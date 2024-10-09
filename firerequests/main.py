@@ -175,7 +175,6 @@ class FireRequests:
     
         Usage:
             - This function downloads the file in parallel chunks, speeding up the process.
-            - It manages asynchronous downloading using asyncio, making multiple requests in parallel.
         """
         # Extract filename from URL if not provided
         if filename is None:
@@ -194,7 +193,6 @@ class FireRequests:
     
         Usage:
             - The function divides the file into smaller chunks and uploads them in parallel to different URLs.
-            - It supports retries and failure handling through exponential backoff for improved robustness.
         """
         asyncio.run(self.upload_file(file_path, parts_urls, chunk_size, max_files))
 
@@ -218,7 +216,7 @@ class FireRequests:
     
         Usage:
             - The function first downloads the file using the traditional `requests` method and measures the time taken.
-            - It then downloads the same file using the asynchronous method and measures the time.
+            - It then downloads the same file using the asynchronous `firerequests` method and measures the time taken.
             - Finally, it prints a comparison of both download times.
         """
         if filename is None:
