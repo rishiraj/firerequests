@@ -51,11 +51,11 @@ class FireRequests:
         self, url: str, filename: str, max_files: int, chunk_size: int, headers: Optional[Dict[str, str]] = None, 
         parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None
     ):
-        headers = headers or {}
+        headers = headers or {"User-Agent": "Wget/1.21.2", "Accept": "*/*", "Accept-Encoding": "identity", "Connection": "Keep-Alive"}
         try:
             async with aiohttp.ClientSession() as session:
                 # Follow redirects and get the final download URL
-                async with session.head(url, allow_redirects=True) as resp:
+                async with session.head(url, headers=headers, allow_redirects=True) as resp:
                     # Resolve the domain name and get IP address
                     url = str(resp.url)
                     print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
