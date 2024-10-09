@@ -112,3 +112,15 @@ fr.compare(url)
 ## License 📄
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](https://github.com/rishiraj/firerequests/blob/main/LICENSE) file for details.
+
+Sponsors
+--------
+Become a sponsor and get a logo here. The funds are used to defray the cost of development.
+
+## Open Source Collective sponsors
+[![Backers on Open Collective](https://opencollective.com/firerequests/backers/badge.svg)](#backers)
+
+### Backers
+[[Become a backer](https://opencollective.com/firerequests#backer)]
+
+<a href="https://opencollective.com/firerequests#backers" target="_blank"><img src="https://opencollective.com/firerequests/backers.svg?width=890"></a>
