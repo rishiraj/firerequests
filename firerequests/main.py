@@ -51,11 +51,11 @@ class FireRequests:
         self, url: str, filename: str, max_files: int, chunk_size: int, headers: Optional[Dict[str, str]] = None, 
         parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None
     ):
-        headers = headers or {}
+        headers = headers or {"User-Agent": "Wget/1.21.2", "Accept": "*/*", "Accept-Encoding": "identity", "Connection": "Keep-Alive"}
         try:
             async with aiohttp.ClientSession() as session:
                 # Follow redirects and get the final download URL
-                async with session.head(url, allow_redirects=True) as resp:
+                async with session.head(url, headers=headers, allow_redirects=True) as resp:
                     # Resolve the domain name and get IP address
                     url = str(resp.url)
                     print(f"--{time.strftime('%Y-%m-%d %H:%M:%S')}--  {url}")
@@ -164,12 +164,36 @@ class FireRequests:
             print(f"Error in upload_chunk: {e}")
 
     def download(self, url: str, filename: Optional[str] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024):
+        """
+        Downloads a file from a given URL asynchronously in chunks, with support for parallel downloads.
+    
+        Args:
+            url (str): The URL of the file to download.
+            filename (Optional[str]): The name of the file to save locally. If not provided, it will be extracted from the URL.
+            max_files (int): The maximum number of concurrent file download chunks. Defaults to 10.
+            chunk_size (int): The size of each chunk to download, in bytes. Defaults to 2MB.
+    
+        Usage:
+            - This function downloads the file in parallel chunks, speeding up the process.
+        """
         # Extract filename from URL if not provided
         if filename is None:
             filename = os.path.basename(urlparse(url).path)
         asyncio.run(self.download_file(url, filename, max_files, chunk_size))
 
     def upload(self, file_path: str, parts_urls: List[str], chunk_size: int = 2 * 1024 * 1024, max_files: int = 10):
+        """
+        Uploads a file to multiple URLs in chunks asynchronously, with support for parallel uploads.
+    
+        Args:
+            file_path (str): The local path to the file to upload.
+            parts_urls (List[str]): A list of URLs where each part of the file will be uploaded.
+            chunk_size (int): The size of each chunk to upload, in bytes. Defaults to 2MB.
+            max_files (int): The maximum number of concurrent file upload chunks. Defaults to 10.
+    
+        Usage:
+            - The function divides the file into smaller chunks and uploads them in parallel to different URLs.
+        """
         asyncio.run(self.upload_file(file_path, parts_urls, chunk_size, max_files))
 
     def normal_download(self, url: str, filename: str):
@@ -183,6 +207,18 @@ class FireRequests:
         progress_bar.close()
 
     def compare(self, url: str, filename: Optional[str] = None):
+        """
+        Compares the time taken to download a file using both the normal (synchronous) method and the asynchronous method.
+    
+        Args:
+            url (str): The URL of the file to download.
+            filename (Optional[str]): The name of the file to save locally. If not provided, it will be extracted from the URL.
+    
+        Usage:
+            - The function first downloads the file using the traditional `requests` method and measures the time taken.
+            - It then downloads the same file using the asynchronous `firerequests` method and measures the time taken.
+            - Finally, it prints a comparison of both download times.
+        """
         if filename is None:
             filename = os.path.basename(urlparse(url).path)
         try:
