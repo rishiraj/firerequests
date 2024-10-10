@@ -7,7 +7,7 @@
     <a href="https://colab.research.google.com/drive/1BIi46kmPQLotG1w9ofTBptlhmnKiKugZ?usp=sharing"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a>
 </p>
 
-**FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **6x real-world speedup** in file downloads and uploads compared to traditional synchronous methods.
+**FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **10x real-world speedup** in file downloads and uploads compared to traditional synchronous methods.
 
 ## Features 🚀
 
