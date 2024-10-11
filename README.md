@@ -118,4 +118,4 @@ Sponsors ❤️
 --------
 Become a sponsor and get a logo here. The funds are used to defray the cost of development.
 
-<a href="https://www.buymeacoffee.com/rishiraj"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=🥤&slug=rishiraj&button_colour=FFDD00&font_colour=000000&font_family=Bree&outline_colour=000000&coffee_colour=ffffff" /></a>
+<a href="https://www.buymeacoffee.com/rishiraj"><img width="200" alt="bmc-button" src="https://github.com/user-attachments/assets/a362b162-c419-4888-bdc9-c33d00d767ad"></a>
