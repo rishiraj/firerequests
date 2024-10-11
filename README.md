@@ -116,6 +116,8 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](https:
 
 Sponsors ❤️
 --------
+<a href="https://x.com/soumikRakshit96" target="_blank"><img src="https://pbs.twimg.com/profile_images/1791522152954429440/TqGn_kos_400x400.jpg" height="72"></a>
+
 Become a sponsor and get a logo here. The funds are used to defray the cost of development.
 
 <a href="https://www.buymeacoffee.com/rishiraj"><img width="200" alt="bmc-button" src="https://github.com/user-attachments/assets/a362b162-c419-4888-bdc9-c33d00d767ad"></a>
