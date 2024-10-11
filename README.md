@@ -118,10 +118,4 @@ Sponsors ❤️
 --------
 Become a sponsor and get a logo here. The funds are used to defray the cost of development.
 
-## Open Source Collective sponsors
-[![Backers on Open Collective](https://opencollective.com/firerequests/backers/badge.svg)](#backers)
-
-### Backers
-[[Become a backer](https://opencollective.com/firerequests#backer)]
-
-<a href="https://opencollective.com/firerequests#backers" target="_blank"><img src="https://opencollective.com/firerequests/backers.svg?width=890"></a>
+<a href="https://www.buymeacoffee.com/rishiraj"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=🥤&slug=rishiraj&button_colour=FFDD00&font_colour=000000&font_family=Bree&outline_colour=000000&coffee_colour=ffffff" /></a>
