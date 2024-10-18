@@ -13,7 +13,7 @@ from aiofiles.os import remove
 from tqdm.asyncio import tqdm
 from functools import partial
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, Any, List, Optional
+from typing import Union, Dict, Any, List, Optional
 
 # Enable nested event loops for environments like Jupyter
 nest_asyncio.apply()
