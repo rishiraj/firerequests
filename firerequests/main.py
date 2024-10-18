@@ -185,23 +185,35 @@ class FireRequests:
             print(f"Error in upload_chunks: {e}")
             return 0
 
-    def download(self, url: str, filename: Optional[str] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024):
+    def download(self, urls: Union[str, List[str]], filenames: Optional[Union[str, List[str]]] = None, headers: Optional[Dict[str, str]] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024):
         """
-        Downloads a file from a given URL asynchronously in chunks, with support for parallel downloads.
+        Downloads files from a given URL or a list of URLs asynchronously in chunks, with support for parallel downloads.
     
         Args:
-            url (str): The URL of the file to download.
-            filename (Optional[str]): The name of the file to save locally. If not provided, it will be extracted from the URL.
+            urls (Union[str, List[str]]): The URL or list of URLs of the files to download.
+            filenames (Optional[Union[str, List[str]]]): The filename or list of filenames to save locally. 
+                If not provided, filenames will be extracted from the URLs.
             max_files (int): The maximum number of concurrent file download chunks. Defaults to 10.
             chunk_size (int): The size of each chunk to download, in bytes. Defaults to 2MB.
     
         Usage:
-            - This function downloads the file in parallel chunks, speeding up the process.
+            - This function downloads the files in parallel chunks, speeding up the process.
         """
-        # Extract filename from URL if not provided
-        if filename is None:
-            filename = os.path.basename(urlparse(url).path)
-        asyncio.run(self.download_file(url, filename, max_files, chunk_size))
+        if isinstance(urls, str):
+            urls = [urls]
+        if isinstance(filenames, str):
+            filenames = [filenames]
+
+        if filenames is None:
+            filenames = [os.path.basename(urlparse(url).path) for url in urls]
+        elif len(filenames) != len(urls):
+            raise ValueError("The number of filenames must match the number of URLs")
+
+        async def download_all():
+            tasks = [self.download_file(url, filename, max_files, chunk_size, headers) for url, filename in zip(urls, filenames)]
+            await asyncio.gather(*tasks)
+    
+        asyncio.run(download_all())
 
     def upload(self, file_path: str, parts_urls: List[str], chunk_size: int = 2 * 1024 * 1024, max_files: int = 10):
         """
