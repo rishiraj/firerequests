@@ -51,6 +51,8 @@ fr.download(url)
 - `--filename` (optional): The name to save the downloaded file. Defaults to filename from URL.
 - `--max_files` (optional): The number of concurrent file chunks. Defaults to 10.
 - `--chunk_size` (optional): The size of each chunk in bytes. Defaults to `2 * 1024 * 1024` (2 MB).
+- `--headers` (optional): A dictionary of headers to include in the download request.
+- `--show_progress` (optional): Whether to show a progress bar. Defaults to True for single file downloads, and False for multiple files.
 
 ## Real-World Speed Test 🏎️
 
@@ -75,17 +77,19 @@ Downloading on 🔥: 100%|██████████| 3.42G/3.42G [02:38<00:
 ```python
 from firerequests import FireRequests
 
-url = "https://example.com/largefile.iso"
-filename = "largefile.iso"
+urls = ["https://example.com/file1.iso", "https://example.com/file2.iso"]
+filenames = ["file1.iso", "file2.iso"]
 
 fr = FireRequests()
-fr.download(url, filename, max_files=10, chunk_size=2 * 1024 * 1024)
+fr.download(urls, filenames, max_files=10, chunk_size=2 * 1024 * 1024, headers={"Authorization": "Bearer token"}, show_progress=True)
 ```
 
-- **`url`**: The URL of the file to download.
-- **`filename`**: The local filename to save the downloaded file.
-- **`max_files`**: The maximum number of concurrent chunk downloads.
-- **`chunk_size`**: The size of each chunk in bytes.
+- **`urls`**: The URL or list of URLs of the file(s) to download.
+- **`filenames`**: The filename(s) to save the downloaded file(s). If not provided, filenames are extracted from the URLs.
+- **`max_files`**: The maximum number of concurrent chunk downloads. Defaults to 10.
+- **`chunk_size`**: The size of each chunk in bytes. Defaults to `2 * 1024 * 1024` (2 MB).
+- **`headers`**: A dictionary of headers to include in the download request (optional).
+- **`show_progress`**: Whether to show a progress bar during download. Defaults to `True` for a single file, and `False` for multiple files (optional).
 
 ### Uploading Files
 
@@ -96,8 +100,14 @@ file_path = "largefile.iso"
 parts_urls = ["https://example.com/upload_part1", "https://example.com/upload_part2", ...]
 
 fr = FireRequests()
-fr.upload(file_path, parts_urls, chunk_size=2 * 1024 * 1024, max_files=10)
+fr.upload(file_path, parts_urls, chunk_size=2 * 1024 * 1024, max_files=10, show_progress=True)
 ```
+
+- **`file_path`**: The local path to the file to upload.
+- **`parts_urls`**: A list of URLs where each part of the file will be uploaded.
+- **`chunk_size`**: The size of each chunk in bytes. Defaults to `2 * 1024 * 1024` (2 MB).
+- **`max_files`**: The maximum number of concurrent chunk uploads. Defaults to 10.
+- **`show_progress`**: Whether to show a progress bar during upload. Defaults to `True`.
 
 ### Comparing Download Speed
 
