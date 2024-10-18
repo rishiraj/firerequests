@@ -85,17 +85,15 @@ class FireRequests:
 
                 if show_progress:
                     progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
-                else:
-                    progress_bar = None
 
                 for chunk_result in asyncio.as_completed(tasks):
                     downloaded = await chunk_result
-                    if progress_bar:
+                    if show_progress:
                         progress_bar.update(downloaded)
                     if callback:
                         await callback(downloaded)
 
-                if progress_bar:
+                if show_progress:
                     progress_bar.close()
 
         except Exception as e:
@@ -119,38 +117,41 @@ class FireRequests:
 
     async def upload_file(
         self, file_path: str, parts_urls: List[str], chunk_size: int, max_files: int, 
-        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None
+        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None, show_progress: bool = True
     ):
         file_size = os.path.getsize(file_path)
         part_size = file_size // len(parts_urls)
         last_part_size = file_size - part_size * (len(parts_urls) - 1)  # To handle any remaining bytes
-
+    
         semaphore = asyncio.Semaphore(max_files)
         tasks = []
         try:
             async with aiohttp.ClientSession() as session:
                 for part_number, part_url in enumerate(parts_urls):
-                    # Calculate start and stop positions for each part
-                    if part_number == len(parts_urls) - 1:  # For the last part, ensure we include the remaining bytes
+                    if part_number == len(parts_urls) - 1:
                         start = part_number * part_size
                         size = last_part_size
                     else:
                         start = part_number * part_size
                         size = part_size
-
-                    # Start uploading the chunks for the given part
+    
                     tasks.append(self.upload_chunk_with_retries(
                         session, part_url, file_path, start, size, chunk_size, semaphore, parallel_failures, max_retries
                     ))
-
-                # Track progress using a progress bar
-                progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Uploading on 🔥")
+    
+                if show_progress:
+                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Uploading on 🔥")
+    
                 for chunk_result in asyncio.as_completed(tasks):
                     uploaded = await chunk_result
-                    progress_bar.update(uploaded)
+                    if show_progress:
+                        progress_bar.update(uploaded)
                     if callback:
                         await callback(uploaded)
-                progress_bar.close()
+    
+                if show_progress:
+                    progress_bar.close()
+    
         except Exception as e:
             print(f"Error in upload_file: {e}")
 
@@ -193,7 +194,7 @@ class FireRequests:
             print(f"Error in upload_chunks: {e}")
             return 0
 
-    def download(self, urls: Union[str, List[str]], filenames: Optional[Union[str, List[str]]] = None, headers: Optional[Dict[str, str]] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024, show_progress: bool = True):
+    def download(self, urls: Union[str, List[str]], filenames: Optional[Union[str, List[str]]] = None, headers: Optional[Dict[str, str]] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024, show_progress: Optional[bool] = None):
         """
         Downloads files from a given URL or a list of URLs asynchronously in chunks, with support for parallel downloads.
     
@@ -204,7 +205,7 @@ class FireRequests:
             headers (Optional[Dict[str, str]]): Headers to include in the download requests.
             max_files (int): The maximum number of concurrent file download chunks. Defaults to 10.
             chunk_size (int): The size of each chunk to download, in bytes. Defaults to 2MB.
-            show_progress (bool): Whether to show a progress bar. Defaults to True.
+            show_progress (Optional[bool]): Whether to show a progress bar. Defaults to True for single file, False for multiple files.
     
         Usage:
             - This function downloads the files in parallel chunks, speeding up the process.
@@ -213,19 +214,23 @@ class FireRequests:
             urls = [urls]
         if isinstance(filenames, str):
             filenames = [filenames]
-
+    
         if filenames is None:
             filenames = [os.path.basename(urlparse(url).path) for url in urls]
         elif len(filenames) != len(urls):
             raise ValueError("The number of filenames must match the number of URLs")
-
+    
+        # Set default for show_progress based on whether it's a single file or list
+        if show_progress is None:
+            show_progress = len(urls) == 1
+    
         async def download_all():
             tasks = [self.download_file(url, filename, max_files, chunk_size, headers, show_progress=show_progress) for url, filename in zip(urls, filenames)]
             await asyncio.gather(*tasks)
     
         asyncio.run(download_all())
 
-    def upload(self, file_path: str, parts_urls: List[str], chunk_size: int = 2 * 1024 * 1024, max_files: int = 10):
+    def upload(self, file_path: str, parts_urls: List[str], chunk_size: int = 2 * 1024 * 1024, max_files: int = 10, show_progress: Optional[bool] = True):
         """
         Uploads a file to multiple URLs in chunks asynchronously, with support for parallel uploads.
     
@@ -234,11 +239,12 @@ class FireRequests:
             parts_urls (List[str]): A list of URLs where each part of the file will be uploaded.
             chunk_size (int): The size of each chunk to upload, in bytes. Defaults to 2MB.
             max_files (int): The maximum number of concurrent file upload chunks. Defaults to 10.
+            show_progress (bool): Whether to show a progress bar during upload. Defaults to True.
     
         Usage:
             - The function divides the file into smaller chunks and uploads them in parallel to different URLs.
         """
-        asyncio.run(self.upload_file(file_path, parts_urls, chunk_size, max_files))
+        asyncio.run(self.upload_file(file_path, parts_urls, chunk_size, max_files, show_progress=show_progress))
 
     def normal_download(self, url: str, filename: str):
         response = requests.get(url, stream=True)
