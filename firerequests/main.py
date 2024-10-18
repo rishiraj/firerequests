@@ -49,7 +49,7 @@ class FireRequests:
 
     async def download_file(
         self, url: str, filename: str, max_files: int, chunk_size: int, headers: Optional[Dict[str, str]] = None, 
-        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None
+        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None, show_progress: bool = True
     ):
         headers = headers or {"User-Agent": "Wget/1.21.2", "Accept": "*/*", "Accept-Encoding": "identity", "Connection": "Keep-Alive"}
         try:
@@ -82,14 +82,22 @@ class FireRequests:
                     tasks.append(self.download_chunk_with_retries(
                         session, url, filename, start, stop, headers, semaphore, parallel_failures, max_retries
                     ))
-    
-                progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
+
+                if show_progress:
+                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
+                else:
+                    progress_bar = None
+
                 for chunk_result in asyncio.as_completed(tasks):
                     downloaded = await chunk_result
-                    progress_bar.update(downloaded)
+                    if progress_bar:
+                        progress_bar.update(downloaded)
                     if callback:
                         await callback(downloaded)
-                progress_bar.close()
+
+                if progress_bar:
+                    progress_bar.close()
+
         except Exception as e:
             print(f"Error in download_file: {e}")
 
@@ -185,7 +193,7 @@ class FireRequests:
             print(f"Error in upload_chunks: {e}")
             return 0
 
-    def download(self, urls: Union[str, List[str]], filenames: Optional[Union[str, List[str]]] = None, headers: Optional[Dict[str, str]] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024):
+    def download(self, urls: Union[str, List[str]], filenames: Optional[Union[str, List[str]]] = None, headers: Optional[Dict[str, str]] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024, show_progress: bool = True):
         """
         Downloads files from a given URL or a list of URLs asynchronously in chunks, with support for parallel downloads.
     
@@ -193,8 +201,10 @@ class FireRequests:
             urls (Union[str, List[str]]): The URL or list of URLs of the files to download.
             filenames (Optional[Union[str, List[str]]]): The filename or list of filenames to save locally. 
                 If not provided, filenames will be extracted from the URLs.
+            headers (Optional[Dict[str, str]]): Headers to include in the download requests.
             max_files (int): The maximum number of concurrent file download chunks. Defaults to 10.
             chunk_size (int): The size of each chunk to download, in bytes. Defaults to 2MB.
+            show_progress (bool): Whether to show a progress bar. Defaults to True.
     
         Usage:
             - This function downloads the files in parallel chunks, speeding up the process.
@@ -210,7 +220,7 @@ class FireRequests:
             raise ValueError("The number of filenames must match the number of URLs")
 
         async def download_all():
-            tasks = [self.download_file(url, filename, max_files, chunk_size, headers) for url, filename in zip(urls, filenames)]
+            tasks = [self.download_file(url, filename, max_files, chunk_size, headers, show_progress=show_progress) for url, filename in zip(urls, filenames)]
             await asyncio.gather(*tasks)
     
         asyncio.run(download_all())
