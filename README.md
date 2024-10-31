@@ -47,8 +47,8 @@ fr.download(url)
 ```
 
 #### Parameters:
-- `url` (required): The URL to download the file from.
-- `--filename` (optional): The name to save the downloaded file. Defaults to filename from URL.
+- `urls` (required): The URL to download the file from.
+- `--filenames` (optional): The name to save the downloaded file. Defaults to filename from URL.
 - `--max_files` (optional): The number of concurrent file chunks. Defaults to 10.
 - `--chunk_size` (optional): The size of each chunk in bytes. Defaults to `2 * 1024 * 1024` (2 MB).
 - `--headers` (optional): A dictionary of headers to include in the download request.
