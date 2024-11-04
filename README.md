@@ -3,7 +3,7 @@
 <p align="center">
     <a href="https://github.com/rishiraj/firerequests/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/rishiraj/firerequests.svg"></a>
     <a href="https://github.com/rishiraj/firerequests"><img alt="PyPi version" src="https://img.shields.io/pypi/pyversions/firerequests.svg"></a>
-    <a href="https://pypi.org/project/firerequests"><img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/firerequests"></a>
+    <a href="https://pepy.tech/project/firerequests"><img src="https://static.pepy.tech/badge/firerequests" alt="PyPI Downloads"></a>
     <a href="https://colab.research.google.com/drive/1BIi46kmPQLotG1w9ofTBptlhmnKiKugZ?usp=sharing"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a>
 </p>
 
