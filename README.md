@@ -7,7 +7,7 @@
     <a href="https://colab.research.google.com/drive/1BIi46kmPQLotG1w9ofTBptlhmnKiKugZ?usp=sharing"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a>
 </p>
 
-**FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **10x real-world speedup** in file downloads and uploads compared to traditional synchronous methods.
+**FireRequests** is a high-performance, asynchronous HTTP client library for Python, engineered to accelerate your file transfers. By harnessing advanced concepts like semaphores, exponential backoff with jitter, concurrency, and fault tolerance, FireRequests can achieve up to a **10x real-world speedup** in file downloads and uploads compared to traditional synchronous methods and enables scalable, parallelized LLM interactions with providers like OpenAI and Google.
 
 ## Features 🚀
 
@@ -15,6 +15,7 @@
 - **Concurrent Transfers**: Uses `asyncio.Semaphore` to limit simultaneous tasks, optimizing performance by managing system resources effectively.
 - **Fault Tolerance**: Retries failed tasks with exponentially increasing wait times, adding random jitter to prevent network congestion.
 - **Chunked Processing**: Files are split into configurable chunks for parallel processing, significantly accelerating uploads/downloads.
+- **Parallelized LLM Generation**: Efficiently handles large-scale language model requests from OpenAI and Google with configurable parallelism.
 - **Compatibility**: Supports environments like Jupyter through `nest_asyncio`, enabling reusable `asyncio` loops for both batch and interactive Jupyter use.
 
 ## Installation 📦
@@ -118,6 +119,35 @@ url = "https://example.com/largefile.iso"
 
 fr = FireRequests()
 fr.compare(url)
+```
+
+### Generating Text with LLMs
+
+FireRequests supports generating responses from LLMs like OpenAI’s and Google’s generative models in parallel batches.
+
+```python
+from firerequests import FireRequests
+
+# Initialize FireRequests
+fr = FireRequests()
+
+# Set parameters
+provider = "openai"
+model = "gpt-4o-mini"
+system_prompt = "Provide concise answers."
+user_prompts = ["What is AI?", "Explain quantum computing.", "What is Bitcoin?", "Explain neural networks."]
+parallel_requests = 2
+
+# Generate responses
+responses = fr.generate(
+    provider=provider,
+    model=model,
+    system_prompt=system_prompt,
+    user_prompts=user_prompts,
+    parallel_requests=parallel_requests
+)
+
+print(responses)
 ```
 
 ## License 📄

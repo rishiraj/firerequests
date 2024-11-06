@@ -287,5 +287,86 @@ class FireRequests:
         except Exception as e:
             print(f"Error in compare: {e}")
 
+    def call_openai_sync(self, model: str, system_prompt: str, user_prompt: str) -> str:
+        from openai import OpenAI
+        client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        completion = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ]
+        )
+        return completion.choices[0].message.content
+
+    async def call_openai(self, model: str, system_prompt: str, user_prompt: str) -> str:
+        return await asyncio.to_thread(self.call_openai_sync, model, system_prompt, user_prompt)
+
+    def call_google_sync(self, model: str, system_prompt: str, user_prompt: str) -> str:
+        import google.generativeai as genai
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+            "response_mime_type": "text/plain",
+        }
+
+        model_instance = genai.GenerativeModel(
+            model_name=model,
+            generation_config=generation_config,
+            system_instruction=system_prompt,
+        )
+
+        chat_session = model_instance.start_chat(history=[])
+        response = chat_session.send_message(user_prompt)
+        return response.text
+
+    async def call_google(self, model: str, system_prompt: str, user_prompt: str) -> str:
+        return await asyncio.to_thread(self.call_google_sync, model, system_prompt, user_prompt)
+
+    async def generate_batch(
+        self, provider: str, model: str, system_prompt: str, user_prompts: List[str]
+    ) -> List[str]:
+        tasks = []
+        for user_prompt in user_prompts:
+            if provider.lower() == "openai":
+                tasks.append(self.call_openai(model, system_prompt, user_prompt))
+            elif provider.lower() == "google":
+                tasks.append(self.call_google(model, system_prompt, user_prompt))
+            else:
+                raise ValueError("Unsupported provider. Choose either 'openai' or 'google'.")
+        
+        responses = await asyncio.gather(*tasks)
+        return responses
+
+    def generate(
+        self, provider: str, model: str, system_prompt: str, user_prompts: List[str], parallel_requests: int = 10
+    ) -> List[str]:
+        """
+        Generates responses for the given list of user prompts in parallel batches.
+
+        Args:
+            provider (str): The API provider to use, either "openai" or "google".
+            model (str): The model to use for generating responses.
+            system_prompt (str): The system message prompt to include in each request.
+            user_prompts (List[str]): List of user messages for generation.
+            parallel_requests (int): Number of parallel requests to make.
+
+        Returns:
+            List[str]: List of generated responses corresponding to each user prompt.
+        """
+        async def generate_all():
+            all_responses = []
+            for i in range(0, len(user_prompts), parallel_requests):
+                batch_prompts = user_prompts[i:i + parallel_requests]
+                batch_responses = await self.generate_batch(provider, model, system_prompt, batch_prompts)
+                all_responses.extend(batch_responses)
+            return all_responses
+
+        return self.loop.run_until_complete(generate_all())
+
 def main():
     fire.Fire(FireRequests)
