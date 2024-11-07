@@ -15,7 +15,7 @@
 - **Concurrent Transfers**: Uses `asyncio.Semaphore` to limit simultaneous tasks, optimizing performance by managing system resources effectively.
 - **Fault Tolerance**: Retries failed tasks with exponentially increasing wait times, adding random jitter to prevent network congestion.
 - **Chunked Processing**: Files are split into configurable chunks for parallel processing, significantly accelerating uploads/downloads.
-- **Parallelized LLM Generation**: Efficiently handles large-scale language model requests from OpenAI and Google with configurable parallelism.
+- **Parallel LLM Call**: Efficiently handles large-scale language model requests from OpenAI and Google with configurable parallelism.
 - **Compatibility**: Supports environments like Jupyter through `nest_asyncio`, enabling reusable `asyncio` loops for both batch and interactive Jupyter use.
 
 ## Installation 📦
@@ -123,7 +123,7 @@ fr.compare(url)
 
 ### Generating Text with LLMs
 
-FireRequests supports generating responses from LLMs like OpenAI’s and Google’s generative models in parallel batches.
+FireRequests supports generating responses from LLMs like OpenAI’s and Google’s generative models in parallel batches. This currently doesn't work in Colab.
 
 ```python
 from firerequests import FireRequests
