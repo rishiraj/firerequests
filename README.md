@@ -15,7 +15,7 @@
 - **Concurrent Transfers**: Uses `asyncio.Semaphore` to limit simultaneous tasks, optimizing performance by managing system resources effectively.
 - **Fault Tolerance**: Retries failed tasks with exponentially increasing wait times, adding random jitter to prevent network congestion.
 - **Chunked Processing**: Files are split into configurable chunks for parallel processing, significantly accelerating uploads/downloads.
-- **Parallel LLM Call**: Efficiently handles large-scale language model requests from OpenAI and Google with configurable parallelism.
+- **Parallel LLM Calls**: Efficiently handles large-scale language model requests from OpenAI and Google with configurable parallelism.
 - **Compatibility**: Supports environments like Jupyter through `nest_asyncio`, enabling reusable `asyncio` loops for both batch and interactive Jupyter use.
 
 ## Installation 📦
