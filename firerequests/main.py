@@ -9,10 +9,7 @@ import socket
 import fire
 from urllib.parse import urlparse
 from aiohttp import ClientSession
-from aiofiles.os import remove
 from tqdm.asyncio import tqdm
-from functools import partial
-from concurrent.futures import ThreadPoolExecutor
 from typing import Union, Dict, Any, List, Optional
 
 # Enable nested event loops for environments like Jupyter
@@ -194,7 +191,7 @@ class FireRequests:
             print(f"Error in upload_chunks: {e}")
             return 0
 
-    def download(self, urls: Union[str, List[str]], filenames: Optional[Union[str, List[str]]] = None, headers: Optional[Dict[str, str]] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024, show_progress: Optional[bool] = None):
+    def download(self, urls: Union[str, List[str]], filenames: Optional[Union[str, List[str]]] = None, headers: Optional[Dict[str, str]] = None, max_files: int = 10, chunk_size: int = 2 * 1024 * 1024, show_progress: Optional[bool] = None) -> List[str]:
         """
         Downloads files from a given URL or a list of URLs asynchronously in chunks, with support for parallel downloads.
     
@@ -229,6 +226,8 @@ class FireRequests:
             await asyncio.gather(*tasks)
     
         asyncio.run(download_all())
+        
+        return filenames
 
     def upload(self, file_path: str, parts_urls: List[str], chunk_size: int = 2 * 1024 * 1024, max_files: int = 10, show_progress: Optional[bool] = True):
         """
