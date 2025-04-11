@@ -46,7 +46,7 @@ class FireRequests:
 
     async def download_file(
         self, url: str, filename: str, max_files: int, chunk_size: int, headers: Optional[Dict[str, str]] = None, 
-        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None, show_progress: bool = True
+        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None, show_progress: bool = True, progress_desc: Optional[str] = None
     ):
         headers = headers or {"User-Agent": "Wget/1.21.2", "Accept": "*/*", "Accept-Encoding": "identity", "Connection": "Keep-Alive"}
         try:
@@ -81,7 +81,7 @@ class FireRequests:
                     ))
 
                 if show_progress:
-                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Downloading on 🔥")
+                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc=progress_desc)
 
                 for chunk_result in asyncio.as_completed(tasks):
                     downloaded = await chunk_result
@@ -114,7 +114,7 @@ class FireRequests:
 
     async def upload_file(
         self, file_path: str, parts_urls: List[str], chunk_size: int, max_files: int, 
-        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None, show_progress: bool = True
+        parallel_failures: int = 3, max_retries: int = 5, callback: Optional[Any] = None, show_progress: bool = True, progress_desc: Optional[str] = None
     ):
         file_size = os.path.getsize(file_path)
         part_size = file_size // len(parts_urls)
@@ -137,7 +137,7 @@ class FireRequests:
                     ))
     
                 if show_progress:
-                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc="Uploading on 🔥")
+                    progress_bar = tqdm(total=file_size, unit="B", unit_scale=True, desc=progress_desc)
     
                 for chunk_result in asyncio.as_completed(tasks):
                     uploaded = await chunk_result
