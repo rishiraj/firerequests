@@ -4,5 +4,3 @@ requests
 nest_asyncio
 tqdm
 fire
-google-generativeai
-openai
