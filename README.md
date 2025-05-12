@@ -123,7 +123,7 @@ fr.compare(url)
 
 ### Generating Text with LLMs
 
-FireRequests supports generating responses from LLMs like OpenAI’s and Google’s generative models in parallel batches. This currently doesn't work in Colab.
+FireRequests allows you to run LLM API calls (like OpenAI or Google) in parallel batches using a decorator. This keeps the library lightweight and lets users supply their own logic for calling APIs. This approach currently doesn't work in Colab.
 
 ```python
 from firerequests import FireRequests
@@ -131,22 +131,30 @@ from firerequests import FireRequests
 # Initialize FireRequests
 fr = FireRequests()
 
-# Set parameters
-provider = "openai"
-model = "gpt-4o-mini"
-system_prompt = "Provide concise answers."
-user_prompts = ["What is AI?", "Explain quantum computing.", "What is Bitcoin?", "Explain neural networks."]
-parallel_requests = 2
+# Use the decorator to define your own prompt function
+@fr.op(max_reqs=2, prompts=[
+    "What is AI?",
+    "Explain quantum computing.",
+    "What is Bitcoin?",
+    "Explain neural networks."
+])
+def generate(system: str = "Provide concise answers.", prompt: str = ""):
+    # You can use OpenAI, Google, or any other LLM API here
+    from openai import OpenAI
+    import os
 
-# Generate responses
-responses = fr.generate(
-    provider=provider,
-    model=model,
-    system_prompt=system_prompt,
-    user_prompts=user_prompts,
-    parallel_requests=parallel_requests
-)
+    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response.choices[0].message.content
 
+# Call your decorated function
+responses = generate()
 print(responses)
 ```
 
